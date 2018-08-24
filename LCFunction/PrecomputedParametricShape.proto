@@ -1,0 +1,141 @@
+syntax = "proto2";
+package OptCAD.proto;
+
+message PrecomputedParametricShape{
+    optional AdaptiveGridCell root = 1;
+    repeated PrecomputedSample samples = 2;
+	optional int32 bootstrapNSamples = 3;
+	repeated AdaptiveGridCell borderCells = 4;
+	repeated double range = 5;
+}
+
+message PrecomputedSample{
+	optional int32 id = 1;
+	repeated double center = 2;
+	optional ShapeInfo shapeInfo = 3;
+	repeated BasisFunction basisFuntions = 4;
+}
+
+message FunctionTestShapeInfo{
+	optional double val = 1;
+}
+
+message Vector4i{
+	optional int32 x = 1;
+	optional int32 y = 2;
+	optional int32 z = 3;
+	optional int32 w = 4;
+}
+
+message Vector3d{
+	optional double x = 1;
+	optional double y = 2;
+	optional double z = 3;
+}
+
+
+enum BoundaryType {
+    FIXED_BOUNDARY = 0;	
+    BOUNDARY_FORCE = 1;
+    BOUNDARY_HEAT = 2;
+  }
+
+message BoundaryConditionValue {
+	optional Vector3d force = 1;
+	optional double heatValue = 2;
+	optional BoundaryType boundaryType = 3;
+}
+
+message BoundaryCondition{
+	optional bool isFixed = 1;
+	optional Vector3d force = 2;
+	repeated int32 vertices =3;
+	optional BoundaryConditionValue value = 4;
+}
+
+message PrecomputedPhysics{
+	optional string name = 1;
+	repeated double values = 2;
+}
+
+message ReferencePoint{
+	optional string id = 1;
+	optional Vector3d pos = 2;
+}
+message Link{
+	optional string first = 1;
+	optional string second = 2;
+	repeated Vector3d midPoints = 3;
+
+}
+
+message ControlLoop{
+	repeated string loop =1;
+}
+
+message BoundaryControl{
+	repeated ControlLoop controlLoops = 1;
+	optional BoundaryConditionValue  value = 2;
+}
+
+message ControlPoints{
+	repeated ReferencePoint point = 1;
+	repeated Link links = 2;
+	repeated BoundaryControl  boundaryControls= 3;
+}
+
+message TetMesh{
+	repeated Vector3d vertices = 1;
+	repeated Vector4i tets = 2;
+	repeated BoundaryCondition boundaryConditions = 3;
+	repeated PrecomputedPhysics precomputedPhysics = 4;
+	optional string filename =5;
+	optional ControlPoints controlPoints = 6;
+}
+
+message ShapeInfo{
+	optional FunctionTestShapeInfo functionShapeInfo = 1;
+	optional TetMesh tetMesh = 2;
+}
+
+message BasisFunction{
+	optional LinearBSpline linearBspline = 1;
+	optional CubicBSpline cubicBspline = 2;
+}
+
+message LinearBSpline{
+	repeated double center = 1;
+	repeated double support = 2;
+	optional double weight = 3;
+}
+
+message CubicBSpline{
+	repeated double center = 1;
+	repeated double support = 2;
+	optional double weight = 3;
+}
+
+message AdaptiveGridCell{
+	repeated double ranges = 1;
+	optional AdaptiveGridLeaf leaf = 2;
+	optional AdaptiveGridInterNode interNode = 3;
+}
+
+message AdaptiveGridLeaf
+{
+	optional ShapeInfo centerShapeInfo = 1;
+	repeated HomeomorphicSample homeomorphicSamples = 2;
+}
+
+message HomeomorphicSample{
+	optional int32 precomputedSampleID = 1;
+	optional ShapeInfo shapeInfo = 2;
+}
+
+message AdaptiveGridInterNode
+{
+	optional AdaptiveGridCell child1 = 1;
+	optional AdaptiveGridCell child2 = 2;
+	optional int32 splidDirection = 3;
+	optional double splitVal = 4;
+}

@@ -1,0 +1,41 @@
+﻿Build started 8/9/2018 2:59:04 PM.
+     1>Project "C:\Users\mitadm\Documents\urop\schulzInterpolate\TestDebug\TestDebug.vcxproj" on node 4 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /IC:\Users\mitadm\Documents\urop\schulzInterpolate\LCFunction /IC:\Users\mitadm\Documents\urop\schulzInterpolate\LCRealFunction /IC:\Users\mitadm\Documents\urop\schulzInterpolate\libs\protobuf\include /IC:\Users\mitadm\Documents\urop\schulzInterpolate\libs\eigen /IC:\Users\mitadm\Documents\urop\schulzInterpolate\LCUtils /IC:\Users\mitadm\Documents\urop\schulzInterpolate\LCAdaptiveSampling /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _LIB /D _MBCS /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt lodepng.cpp TestDebug.cpp
+         lodepng.cpp
+         TestDebug.cpp
+     1>C:\Users\mitadm\Documents\urop\schulzInterpolate\LCUtils\LCTimer.h(25): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
+     1>C:\Users\mitadm\Documents\urop\schulzInterpolate\LCUtils\LCTimer.h(31): warning C4018: '<' : signed/unsigned mismatch
+     1>C:\Users\mitadm\Documents\urop\schulzInterpolate\LCUtils\LCTimer.h(38): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
+     1>TestDebug.cpp(59): warning C4018: '<' : signed/unsigned mismatch
+     1>TestDebug.cpp(86): warning C4244: 'argument' : conversion from 'double' to 'unsigned int', possible loss of data
+     1>TestDebug.cpp(89): warning C4244: 'argument' : conversion from 'double' to 'unsigned int', possible loss of data
+     1>TestDebug.cpp(90): warning C4244: 'argument' : conversion from 'double' to 'unsigned int', possible loss of data
+     1>TestDebug.cpp(91): warning C4244: 'argument' : conversion from 'double' to 'unsigned int', possible loss of data
+     1>TestDebug.cpp(92): warning C4244: 'argument' : conversion from 'double' to 'unsigned int', possible loss of data
+     1>TestDebug.cpp(97): warning C4244: 'argument' : conversion from 'double' to 'unsigned int', possible loss of data
+     1>TestDebug.cpp(98): warning C4244: 'argument' : conversion from 'double' to 'unsigned int', possible loss of data
+     1>TestDebug.cpp(99): warning C4244: 'argument' : conversion from 'double' to 'unsigned int', possible loss of data
+     1>TestDebug.cpp(100): warning C4244: 'argument' : conversion from 'double' to 'unsigned int', possible loss of data
+     1>TestDebug.cpp(104): warning C4244: 'argument' : conversion from 'double' to 'unsigned int', possible loss of data
+     1>TestDebug.cpp(105): warning C4244: 'argument' : conversion from 'double' to 'unsigned int', possible loss of data
+     1>TestDebug.cpp(106): warning C4244: 'argument' : conversion from 'double' to 'unsigned int', possible loss of data
+     1>TestDebug.cpp(107): warning C4244: 'argument' : conversion from 'double' to 'unsigned int', possible loss of data
+     1>TestDebug.cpp(174): warning C4018: '<' : signed/unsigned mismatch
+     1>TestDebug.cpp(184): warning C4018: '<' : signed/unsigned mismatch
+     1>TestDebug.cpp(188): warning C4244: 'initializing' : conversion from 'double' to 'int', possible loss of data
+     1>TestDebug.cpp(189): warning C4244: 'initializing' : conversion from 'double' to 'int', possible loss of data
+     1>TestDebug.cpp(213): warning C4018: '<' : signed/unsigned mismatch
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\mitadm\Documents\urop\schulzInterpolate\build\Release\TestDebug.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:C:/Users/mitadm/Documents/urop/schulzInterpolate/../bin /LIBPATH:C:/Users/mitadm/Documents/urop/schulzInterpolate/../bin/Release LCUtils.lib LCAdaptiveSampling.lib LCFunction.lib LCRealFunction.lib ..\..\libs\protobuf\lib\libprotobuf.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\mitadm\Documents\urop\schulzInterpolate\build\Release\TestDebug.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\mitadm\Documents\urop\schulzInterpolate\build\Release\TestDebug.lib" /MACHINE:X86 /SAFESEH Release\lodepng.obj
+         Release\TestDebug.obj
+         C:\Users\mitadm\Documents\urop\bin\Release\LCUtils.lib
+         C:\Users\mitadm\Documents\urop\bin\Release\LCFunction.lib
+         C:\Users\mitadm\Documents\urop\bin\Release\LCRealFunction.lib
+         C:\Users\mitadm\Documents\urop\bin\Release\LCAdaptiveSampling.lib
+     1>LINK : fatal error LNK1181: cannot open input file '..\..\libs\protobuf\lib\libprotobuf.lib'
+     1>Done Building Project "C:\Users\mitadm\Documents\urop\schulzInterpolate\TestDebug\TestDebug.vcxproj" (Build target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:03.48
