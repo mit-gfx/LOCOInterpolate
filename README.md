@@ -6,7 +6,7 @@ Please reference this [this paper](https://homes.cs.washington.edu/~adriana/inst
 # Setup
 Clone repository:
 ```
-git clone git@github.com:czwmit/schulzInterpolate.git
+git clone https://github.com/mit-gfx/LOCOInterpolate
 ```
 
 Download Eigen v3.3.5 from http://eigen.tuxfamily.org/ and place all Eigen files in this location:
@@ -31,7 +31,7 @@ Place the libprotobuf.a file in
 LOCOInterpolate/libs/protobuf/lib
 ```
 
-To build InstantCAD, execute the following in the schulzInterpolate directory:
+To build InstantCAD, execute the following in the LOCOInterpolate directory:
 ```
 $ mkdir build && cd build
 $ cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release ..
@@ -53,7 +53,7 @@ Place the libprotobuf.lib file in
 LOCOInterpolate/libs/protobuf/lib
 ```
 
-To build InstantCAD, execute the following in the schulzInterpolate directory:
+To build InstantCAD, execute the following in the LOCOInterpolate directory:
 ```
 C:\> mkdir build
 C:\> cd build
