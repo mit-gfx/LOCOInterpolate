@@ -1,6 +1,6 @@
 # LOCOInterpolate
 Algorithm for **LO**cal **CO**ntinuous Interpolation developed by Schulz et al 2017.
-Please reference this [this paper](https://homes.cs.washington.edu/~adriana/) for description of the method.
+Please reference this [this paper](https://homes.cs.washington.edu/~adriana/instantCAD/index.html) for description of the method.
 
 
 # Setup
