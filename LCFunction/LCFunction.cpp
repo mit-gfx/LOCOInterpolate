@@ -56,8 +56,6 @@ LCError LCFunction::getRelativeParamVal(int i, double alpha, double *result )
 
 }
 
-
-
 std::vector<double> LCFunction::mapToStandardHypercube(const std::vector<double> & params)
 {
 
@@ -74,24 +72,17 @@ std::vector<double> LCFunction::mapToStandardHypercube(const std::vector<double>
 
 }
 
-
-
 std::vector<double> LCFunction::mapFromStandardHypercube(const std::vector<double> &unitParams)
 {
-	//std::cout << "mapping from standard hypercube " << std::endl;
 	std::vector<double>result(unitParams.size());
 	for (int i = 0; i < unitParams.size(); i++)
 	{
 		double alpha = (unitParams[i] + 1.) / 2.;
-	//	std::cout << i << " min range " << getMinRange(i) << " " << getMaxRange(i) << std::endl;
 		result[i] = getMinRange(i)*(1 - alpha) + getMaxRange(i)*alpha;
 	}
-	//std::cout << "mapping from standard hypercube done " << std::endl;
-
 	return result;
 
 }
-
 
 void LCFunction::getRanges(std::vector<double> * ranges)
 {

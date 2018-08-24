@@ -13,6 +13,7 @@ class LCRealFunctionValue : public LCFunctionValue
 {
 public:
 	LCRealFunctionValue(double val);
+	~LCRealFunctionValue();
 	LCError computeDifference(LCFunctionValue *other, double *result);
 	LCError computeErrorVector(LCFunctionValue *other, Eigen::VectorXd *result);
 	LCError add(double weight, LCFunctionValue *other);

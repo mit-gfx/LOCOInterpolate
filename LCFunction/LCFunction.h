@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <Eigen/Dense>
+#include <iostream>
 
 class LCError;
 class LCFunctionValue;
@@ -44,7 +45,7 @@ public:
 	std::vector<double> mapFromStandardHypercube(const std::vector<double> &unitParams);
 	/* returns the vector of ranges */
 	void getRanges(std::vector<double> * ranges);
-
+	void log() { std::cout << "nParams " << getNParams() << std::endl; }
 };
 
 #endif

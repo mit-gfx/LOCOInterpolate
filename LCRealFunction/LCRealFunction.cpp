@@ -13,13 +13,12 @@ LCRealFunction::LCRealFunction(int nParams, bool linear)
 		ranges_.push_back(0);
 		ranges_.push_back(1);
 	}
-	if (!linear)
-	{
-		srand(5);
-		nSinSums_ = 10; // the larger the more complex the function 
-		amplitudeValues_ = Eigen::MatrixXd::Random(nParams_, nSinSums_);
-		phaseValues_ = Eigen::MatrixXd::Random(nParams_, nSinSums_);
-	}
+
+	//will only be used if not linear
+	srand(5);
+	nSinSums_ = 10; // the larger the more complex the function 
+	amplitudeValues_ = Eigen::MatrixXd::Random(nParams_, nSinSums_);
+	phaseValues_ = Eigen::MatrixXd::Random(nParams_, nSinSums_);
 }
 int LCRealFunction::getNParams() const
 {

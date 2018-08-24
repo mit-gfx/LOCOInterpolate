@@ -15,6 +15,11 @@ LCRealFunctionValue::LCRealFunctionValue(double val) : LCFunctionValue()
 	this->val = val;
 }
 
+LCRealFunctionValue::~LCRealFunctionValue()
+{
+
+}
+
 
 LCError LCRealFunctionValue::computeDifference(LCFunctionValue *other, double *result)
 {

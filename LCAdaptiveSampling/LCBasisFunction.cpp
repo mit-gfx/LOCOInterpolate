@@ -208,8 +208,6 @@ LCError LCBasisFunction::newFromCopyKey(const LCBasisFunctionKey &basisFunction,
 
 LCError LCBasisFunction::refineAllDirections(std::vector<LCBasisFunction*> *basisFunctions)
 {
-	//std::cout << "original basis function" << std::endl;
-	//this->log();
 	LCError err;
 	std::vector<LCBasisFunction*> allNewBasisFunctions;
 	for (int dir = 0; dir < (this->getCenter()).size(); dir++)
@@ -222,14 +220,6 @@ LCError LCBasisFunction::refineAllDirections(std::vector<LCBasisFunction*> *basi
 		}
 		allNewBasisFunctions.insert(allNewBasisFunctions.end(), newBasisFunctions.begin(), newBasisFunctions.end());
 	}
-
-	//std::cout << "final basis funcitons: " << allNewBasisFunctions.size() + 1 << std::endl;
-	//this->log();
-	//for (LCBasisFunction* basisFunction : allNewBasisFunctions)
-	//{
-	//	basisFunction->log();
-	//}
-
 
 	basisFunctions->insert(basisFunctions->end(), allNewBasisFunctions.begin(), allNewBasisFunctions.end());
 
@@ -382,12 +372,6 @@ void LCLinearBSpline::log()
 LCCubicBSpline::LCCubicBSpline(const Eigen::VectorXd &center,
 	const Eigen::VectorXd &support, double weight) : LCBasisFunction()
 {
-	if (center(0) > 0 && center(0) < 0.005 || center(1) > 0 && center(1) < 0.005)
-	{
-		std::cout << "small weight constructor " << center.transpose() << std::endl;
-		system("pause");
-	}
-
 	center_ = center;
 	support_ = support;
 	weight_ = weight;
@@ -520,11 +504,6 @@ LCError LCCubicBSpline::refine(int dir, std::vector<LCBasisFunction*> *basisFunc
 	basisFunctions->push_back(new LCCubicBSpline(newCenterBP, newSupport, weight_ * 1.0 / 8.0));
 	support_ = newSupport;
 	weight_ *= 6.0 / 8.0;
-	if (center_(0) > 0 && center_(0) < 0.005 || center_(1) > 0 && center_(1) < 0.005)
-	{
-		std::cout << "small weight refine " << center_.transpose() << std::endl;
-		system("pause");
-	}
 	return err;
 }
 

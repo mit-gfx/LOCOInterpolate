@@ -18,21 +18,7 @@ LCError LCFunctionValueMap::newMapFromShapePair(LCFunctionValue *sourceShape, LC
 		*result = new LCRealFunctionValueMap();
 		return err;
 	}
-/*	auto sourceTet = dynamic_cast<OCTetCADShapeInfo*>(sourceShape);
 
-	if (sourceTet)
-	{
-		auto targetTet = dynamic_cast<OCTetCADShapeInfo*>(targetShape);
-		if (!targetTet)
-		{
-			return LCError("shape info type inconsistent");
-		}
-		OCTetCADShapeInfoMap* mapResult = new OCTetCADShapeInfoMap();
-		mapResult->buildMap(sourceTet, targetTet);
-		*result = mapResult;
-		return err;
-	}
-*/
 	return LCError("Shape info type not specified");
 
 }

@@ -50,19 +50,9 @@ LCError compareVectors(std::vector<double> vec1, std::vector<double> vec2, doubl
 	double error = 0;
 	double maxError = 0;
 
-//	double max_val = 0;
-//	for (int i = 1; i < vec1.size(); i++)
-//	{
-//		max_val = std::max({ std::abs(vec1[i]), std::abs(vec2[i]), max_val });
-//	}
-
 	for (int i = 1; i < vec1.size(); i++)
 	{
-		//double exact_val = vec1[i] + max_val;
-		//double approx_val = vec2[i] + max_val;
-	//	double cellError = std::abs((exact_val - approx_val) / exact_val);
 		double cellError = std::abs(vec1[i] - vec2[i]);
-		//std::cout << "cell error " << cellError << std::endl;
 		error += cellError;
 		maxError = std::max({ maxError, cellError });
 	}
@@ -78,7 +68,6 @@ void colorData(std::vector<double> *values, std::vector<unsigned char> *image, i
 	double min_val = *(std::min_element(std::begin(*values), std::end(*values)));
 	double max_val = *(std::max_element(std::begin(*values), std::end(*values)));
 	double range = max_val - min_val;
-	//std::cout << "min_val " << min_val << std::endl;
 	for (double y = 0; y < width; y += 1)
 	{
 		for (double x = 0; x < width; x += 1)
@@ -221,7 +210,6 @@ LCError testFunctionLinearApproximation(LCAdaptiveSamplingParams params, LCBasis
 	outputMatrix(originFunction, 20, outName + "_origin.png", &exactVals);
 	outputMatrix(approxFunction, 20, outName + "_approx.png", &approxVals);
 	outputMatrixSamples(&samples, outName + "_samples.png", width);
-	//std::cout << "done with output matrix " << std::endl;
 	compareVectors(exactVals, approxVals, 0.1);//Compare the sampled values of the original function and the approximated function
 	return LCError();
 }
@@ -233,8 +221,8 @@ LCError protoTest()
 	int nParams = 2;
 	LCError err;
 	LCRealFunction* paramShape = new LCRealFunction(nParams, true);//function that is RxR -> R
-	Eigen::VectorXd allowedError = 0.1 * Eigen::VectorXd::Ones(1);
-	LCAdaptiveGrid grid(paramShape, LCBasisFunction::LCBasisFunctionType::CUBIC_BSPLINE, allowedError, 0, 0, true);//Parametric shape
+	LCAdaptiveSamplingParams params(0, 0.1, 0, 0);
+	LCAdaptiveGrid grid(paramShape, LCBasisFunction::LCBasisFunctionType::CUBIC_BSPLINE, &params, true);//Parametric shape
 
 	/*Randomly refine cells of the kd-tree*/
 	srand(1);
@@ -328,9 +316,8 @@ LCError linearPrecisionTestCubic()
 	int nParams = 3;
 	LCError err;
 	LCRealFunction* paramShape = new LCRealFunction(nParams, true);
-	Eigen::VectorXd allowedError = 0.1 * Eigen::VectorXd::Ones(1);
-	LCAdaptiveGrid grid(paramShape, LCBasisFunction::LCBasisFunctionType::CUBIC_BSPLINE, allowedError, 0, 0, true);
-
+	LCAdaptiveSamplingParams params(0, 0.1, 0, 0);
+	LCAdaptiveGrid grid(paramShape, LCBasisFunction::LCBasisFunctionType::CUBIC_BSPLINE, &params, true);//Parametric shape
 	/* random refinement*/
 	srand(1);
 	int refined = 0;
@@ -397,8 +384,8 @@ LCError linearPrecisionTestLinear()
 	int nParams = 1;
 	LCError err;
 	LCRealFunction* paramShape = new LCRealFunction(nParams, true);
-	Eigen::VectorXd allowedError = 0.1 * Eigen::VectorXd::Ones(1);
-	LCAdaptiveGrid grid(paramShape, LCBasisFunction::LCBasisFunctionType::LINEAR_BSPLINE, allowedError, 0, 0, true);
+	LCAdaptiveSamplingParams params(0, 0.1, 0, 0);
+	LCAdaptiveGrid grid(paramShape, LCBasisFunction::LCBasisFunctionType::CUBIC_BSPLINE, &params, true);//Parametric shape
 
 	/* random refinement*/
 	srand(1);
@@ -446,7 +433,6 @@ LCError linearPrecisionTestLinear()
 		{
 			/* if the funciton is linear this should never be called! */
 			linearPrecision = false;
-			//std::cout << "error = " << error << "- at point(" << paramsVec.transpose() << ")" << std::endl;
 		}
 	}
 	if (linearPrecision)
@@ -484,7 +470,7 @@ int main(int argc, char* argv[])
 				  << "\nbootstrap " << bootstrap << "\nerror samples " << errorSample 
 				  << "\noptimal direction " << optimalDirection << std::endl;
 
-		std::string name = "linear" + std::string("_thresh_") + std::to_string(threshold) + std::string("_maxDepth_") + std::to_string(maxDepth) + std::string("_bootstrap_") + std::to_string(bootstrap);
+		std::string name = "cubic" + std::string("_thresh_") + std::to_string(threshold) + std::string("_maxDepth_") + std::to_string(maxDepth) + std::string("_bootstrap_") + std::to_string(bootstrap);
 		testFunctionLinearApproximation(params, LCBasisFunction::LCBasisFunctionType::CUBIC_BSPLINE, name, 100);
 	}
 

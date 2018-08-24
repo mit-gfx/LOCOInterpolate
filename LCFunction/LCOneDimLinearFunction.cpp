@@ -41,7 +41,6 @@ LCError LCOneDimLinearFunction::evalDeriv(const std::vector<double> &params, int
 LCError LCOneDimLinearFunction::evalShapeInfo(const std::vector<double> &params, LCFunctionValue **shapeInfo)
 {
 	LCError err;
-	//LCErrorReturn(validateParameters(params));
 	double val = 1;
 	for (int i = 0; i < nParams_; i++)
 	{

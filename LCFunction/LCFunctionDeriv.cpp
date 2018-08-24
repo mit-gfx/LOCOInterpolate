@@ -30,22 +30,6 @@ LCError LCFunctionDeriv::newFromWeightedSum(const std::vector<std::pair<double, 
 		return err;
 	}
 
-
-	//removed by czw 07-11-2018
-	/*if (dynamic_cast<OCTetCADShapeInfo*>(weightedSamples[0].second))
-	{
-		auto tetShapeInfo = dynamic_cast<OCTetCADShapeInfo*>(weightedSamples[0].second);
-		OCTetCADDerivInfo* derivInfo = new OCTetCADDerivInfo(tetShapeInfo, weightedSamples[0].first);
-		for (int i = 1; i < weightedSamples.size(); i++)
-		{
-			tetShapeInfo = dynamic_cast<OCTetCADShapeInfo*>(weightedSamples[i].second);
-			LCErrorReturn(derivInfo->add(weightedSamples[i].first, tetShapeInfo));
-		}
-
-		*result = derivInfo;
-		return err;
-	}*/
-
 	return LCError("Shape info type not specified");
 
 }

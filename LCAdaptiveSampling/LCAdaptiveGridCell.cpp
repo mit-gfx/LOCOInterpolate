@@ -259,12 +259,6 @@ void LCAdaptiveGridCell::getAllLeafCells(std::vector<LCAdaptiveGridCell*> *leafC
 
 LCError LCAdaptiveGridCell::getCointainingLeaf(const std::vector<double> &params, LCAdaptiveGridCell **leafCell)
 {
-	/*std::cout << "here in the get containing leaf function" << std::endl;
-	for (int i = 0; i < params.size(); i++)
-	{
-	std::cout << params[i] << " ";
-	}
-	std::cout << std::endl;*/
 	if (this->isLeaf_)
 	{
 		*leafCell = this;
@@ -315,32 +309,6 @@ LCError LCAdaptiveGridCell::getSmallestCointainingLeaf(const std::vector<double>
 
 LCError LCAdaptiveGridCell::getAdjacentLeaves(const std::vector<double> &params, std::unordered_set<LCAdaptiveGridCell*> *result)
 {
-
-	if ((std::abs(params[0] - 0.937509) < 0.000001) && (std::abs(params[1] - 0.875003) < 0.000001))
-	{
-		std::cout << "bad basis center get adjacent leaves " << std::endl;
-		std::cout << "basisCenter: ";
-		for (int i = 0; i < params.size(); i++)
-		{
-			std::cout << params[i] << " ";
-		};
-		std::cout << std::endl;
-		this->log(0);
-		std::cout << "this split direction " << this->splitDirection_ << std::endl;
-		std::cout << "this leaf: " << this->isLeaf_ << std::endl;
-		std::cout << "this split val " << this->splitVal_ << std::endl;
-		std::cout << "params at the split direction " << params[this->splitDirection_] << std::endl;
-		if (params[this->splitDirection_] < this->splitVal_ + CONTAINING_EPSILON)
-		{
-			std::cout << " params smaller than splitVal. Params: " << params[this->splitDirection_] << " splitVal " << this->splitVal_ + CONTAINING_EPSILON << std::endl;
-		}
-		if (params[this->splitDirection_] > this->splitVal_ - CONTAINING_EPSILON)
-		{
-			std::cout << " params larger than splitVal. Params: " << params[this->splitDirection_] << " splitVal " << this->splitVal_ - CONTAINING_EPSILON << std::endl;
-		}
-		//std::cout << "params in cell " << err.isOK() << std::endl;
-	}
-
 	LCError err;
 	if (this->isLeaf_)
 	{
@@ -350,27 +318,17 @@ LCError LCAdaptiveGridCell::getAdjacentLeaves(const std::vector<double> &params,
 		{
 			result->insert(this);
 		}
-
-		/*std::cout << "results ";
-		for (auto *cell : *result)
-		{
-		cell->log(0);
-		}
-		std::cout << std::endl;*/
 		return err;
 	}
 	if (params[this->splitDirection_] <= this->splitVal_ + CONTAINING_EPSILON)
 	{
-		//	std::cout << " params smaller than splitVal. Params: " << params[this->splitDirection_] << " splitVal " << this->splitVal_ + CONTAINING_EPSILON << std::endl;
 		LCErrorReturn(child1_->getAdjacentLeaves(params, result));
 	}
 	if (params[this->splitDirection_] >= this->splitVal_ - CONTAINING_EPSILON)
 	{
-		//	std::cout << " params larger than splitVal. Params: " << params[this->splitDirection_] << " splitVal " << this->splitVal_ - CONTAINING_EPSILON << std::endl;
 		LCErrorReturn(child2_->getAdjacentLeaves(params, result));
 	}
 
-	//std::cout << "no cases hit " << std::endl;
 	return err;
 }
 
@@ -441,33 +399,13 @@ LCError LCAdaptiveGridCell::createHomeomorphicMap(LCFunctionValue *centerShapeIn
 
 	for (auto sample : samples)
 	{
-		//std::cout << "before mapping homeo" << std::endl;
-		//system("pause");
 		LCFunctionValue* shapeInfo = nullptr;
 
-		//std::cout << "computing homeomorphic mapping for center shape at " << centerVector.transpose() << " to shape " << sample->getCenter().transpose() << std::endl;
 		err = (sample->getShapeInfo()->getHomeophicShapeInfo(centerShapeInfo_, &shapeInfo));
 		if (!err.isOK())
 		{
 			std::cout << err.internalDescription() << std::endl;
 		}
-
-		//map the physics - 7-11-18 removed by czw because contained references to tetCAD	
-		/*OCTetCADShapeInfo* sampleShapeInfo = dynamic_cast<OCTetCADShapeInfo*>(sample->getShapeInfo());
-		if (sampleShapeInfo->isTetCAD())
-		{
-		std::cout << "cast to tet CAD in create homeomorphic map "<<std::endl;
-
-		if (sampleShapeInfo->nPhysics() > 0)
-		{
-		std::cout << "physics to compute " << std::endl;
-		LCFunctionValueMap * map;
-		LCFunctionValueMap::newMapFromShapePair(sample->getShapeInfo(), shapeInfo, &map);
-		map->mapPrecomputedPhysics(sample->getShapeInfo(), shapeInfo);
-		delete map;
-		}
-		}*/
-
 		samples_[sample] = shapeInfo;
 
 	}
@@ -483,19 +421,6 @@ LCError LCAdaptiveGridCell::addSample(LCSample* sample)
 	LCFunctionValue* shapeInfo = nullptr;
 	LCErrorReturn(sample->getShapeInfo()->getHomeophicShapeInfo(centerShapeInfo_, &shapeInfo));
 	samples_[sample] = shapeInfo;
-
-	//map the physics - removed by czw 7-11-18 because contained references to physics
-	/*OCTetCADShapeInfo* sampleShapeInfo = dynamic_cast<OCTetCADShapeInfo*>(sample->getShapeInfo());//no more dynamic cast
-	if (sampleShapeInfo)
-	{
-	if (sampleShapeInfo->nPhysics() > 0)
-	{
-	LCFunctionValueMap * map;
-	LCFunctionValueMap::newMapFromShapePair(sample->getShapeInfo(), shapeInfo, &map);
-	map->mapPrecomputedPhysics(sample->getShapeInfo(), shapeInfo);
-	delete map;
-	}
-	}*/
 	return err;
 }
 
@@ -512,12 +437,6 @@ LCError LCAdaptiveGridCell::addSample(LCSample* sample, LCFunctionValue* shapeIn
 
 LCError LCAdaptiveGridCell::evalPametersAreInCell(const std::vector<double> & params)
 {
-	/*std::cout << "here in evalParametrsAreInCell and these are the parameters ";
-	for (int i = 0; i < params.size(); i++)
-	{
-	std::cout << params[i] << " ";
-	}
-	std::cout << std::endl;*/
 
 	if (params.size() != ranges_.size() / 2)
 	{
@@ -528,28 +447,6 @@ LCError LCAdaptiveGridCell::evalPametersAreInCell(const std::vector<double> & pa
 		if ((params[i] < (ranges_[2 * i]) - LCMathHelper::EPSILON)
 			|| (params[i] > (ranges_[2 * i + 1]) + LCMathHelper::EPSILON))
 		{
-			/*
-			if ((params[i] < (ranges_[2 * i]) - LCMathHelper::EPSILON)){
-			std::cout << "(params[i] < (ranges_[2 * i]) - LCMathHelper::EPSILON) " << std::endl;
-			}
-			if ((params[i] > (ranges_[2 * i + 1]) + LCMathHelper::EPSILON)){
-			std::cout << "(params[i] > (ranges_[2 * i + 1]) + LCMathHelper::EPSILON) " << std::endl;
-			}
-			std::cout << "params[i] " << params[i] << " " << i << std::endl;
-
-			std::cout << "here in evalParametrsAreInCell and found bad parameters ";
-			for (int i = 0; i < ranges_.size() / 2; i++)
-			{
-			std::cout << params[i] << " ";
-			}
-			std::cout << std::endl;
-			std::cout << "here in evalParametrsAreInCell and these are the ranges ";
-			for (int i = 0; i < ranges_.size(); i++)
-			{
-			std::cout << ranges_[i] << " ";
-			}
-			std::cout << std::endl;
-			*/
 			return LCError("parameter ouside cell");
 		}
 	}
@@ -607,27 +504,6 @@ LCError LCAdaptiveGridCell::getClosestShapeInfo(Eigen::VectorXd &center, LCFunct
 
 }
 
-//czw 7-11-18 - got rid of logging function because it contains references to mesh
-/*void LCAdaptiveGridCell::logAllSamples(std::string name)
-{
-std::cout << "outputting samples for cell at ";
-logRanges(0);
-for (auto s : samples_)
-{
-{
-std::stringstream filename;
-filename << "..//..//..//data//meshes//sampleslist_" << name << s.first->getCenter().transpose();
-TriangularMesh tri_meshSource;
-tri_meshSource.getFromTetMesh((s.first->getShapeInfo())->getMesh());
-OCMorphingUtils::VisualizationUtils::writeMeshToPLYFile(tri_meshSource, (filename.str() + "first.ply").c_str());
-TriangularMesh tri_meshOrig;
-tri_meshOrig.getFromTetMesh((s.first->getShapeInfo())->getMesh());
-OCMorphingUtils::VisualizationUtils::writeMeshToPLYFile(tri_meshOrig, (filename.str() + "second.ply").c_str());
-std::cout << "finished mapping" << std::endl;
-}
-}
-}*/
-
 LCError LCAdaptiveGridCell::getNeightbourShapeInfoMappingMapping(LCAdaptiveGridCell* neighbor, Eigen::VectorXd center,
 	LCFunctionValueMap **result)
 {
@@ -638,11 +514,6 @@ LCError LCAdaptiveGridCell::getNeightbourShapeInfoMappingMapping(LCAdaptiveGridC
 	auto neighborSamples = neighbor->getPrecomputedSamples();
 	LCFunctionValue *neighborShapeInfo = nullptr;
 	LCFunctionValue *thisShapeInfo = nullptr;
-	//LCFunctionValue *orgShapeInfo = nullptr;
-	//LCFunctionValue *orgShapeInf2o = nullptr;
-	//std::cout << "neighbor = "; neighbor->logRanges(0);
-	//std::cout << "center = " << center.transpose() << std::endl;
-	//std::cout << "neighbor centerd at " << center.transpose() << std::endl;
 	for (auto thisSample : samples_)
 	{
 		auto neightborSample = neighborSamples.find(thisSample.first);
@@ -651,12 +522,8 @@ LCError LCAdaptiveGridCell::getNeightbourShapeInfoMappingMapping(LCAdaptiveGridC
 			double dist = (thisSample.first->getCenter() - center).norm();
 			if (dist < minDist)
 			{
-				//std::cout << "closest sample centerd at " << thisSample.first->getCenter().transpose() << std::endl;
-				//std::cout << "neighbor sample centerd at " << neightborSample->first->getCenter().transpose() << std::endl;
 				thisShapeInfo = thisSample.second;
 				neighborShapeInfo = neightborSample->second;
-				//orgShapeInfo = thisSample.first->getShapeInfo();
-				//orgShapeInf2o = neightborSample->first->getShapeInfo();
 				foundMin = true;
 				minDist = dist;
 			}
@@ -695,13 +562,11 @@ LCError LCAdaptiveGridCell::getAllInfluencingSamples(LCBasisFunction::LCBasisFun
 
 	LCError err;
 	std::unordered_map<LCSample*, bool> processedSamples;
-	//std::cout << " h 0" << std::endl;
 	for (auto sample : samples_)
 	{
 		influencingSamples->push_back(sample);
 		processedSamples[sample.first] = true;
 	}
-	//std::cout << " h 1" << std::endl;
 
 	switch (basisType)
 	{
@@ -781,11 +646,6 @@ LCError LCAdaptiveGridCell::evalShapeInfo(const std::vector<double> &params,
 			std::cout << err.internalDescription();
 			return err;
 		}
-		/*if (weight > 0)
-		{
-
-		std::cout << "sample center = " << sample.first->getCenter().transpose() << std::endl;
-		}*/
 		weightSum += weight;
 		weightedSamples.push_back(std::make_pair(weight, sample.second));
 	}
@@ -895,7 +755,6 @@ LCError LCAdaptiveGridCell::getSample(const Eigen::VectorXd &center, LCSample** 
 {
 	for (auto sample : samples_)
 	{
-		//std::cout << (sample.first->getCenter() - center).norm() << std::endl;
 		if ((sample.first->getCenter() - center).norm() < CONTAINING_EPSILON)
 		{
 			*result = sample.first;
@@ -993,25 +852,6 @@ LCError LCAdaptiveGridCell::getAffectedRangeWhenSplitting(const Eigen::VectorXd 
 			uncoverdRegion->push_back(halfRanges);
 			return LCError();
 		}
-
-		/*		std::vector<double> rootRanges = getRoot()->getRanges();
-		if ( (sampleCenter > cellCenter) && (abs(cellMin - rootRanges[2 * dir]) < LCMathHelper::EPSILON))
-		{
-		std::vector<double> borderRanges = ranges_;
-		borderRanges[2 * dir] = cellMin - 10;
-		borderRanges[2 * dir + 1] = cellMin;
-		uncoverdRegion->push_back(borderRanges);
-		return LCError();
-		}
-		if ((sampleCenter < cellCenter) && (abs(cellMax - rootRanges[2 * dir + 1]) < LCMathHelper::EPSILON))
-		{
-		std::vector<double> borderRanges = ranges_;
-		borderRanges[2 * dir] = cellMax;
-		borderRanges[2 * dir + 1] = cellMax + 10;
-		uncoverdRegion->push_back(borderRanges);
-		return LCError();
-		}
-		*/
 		for (auto neighbor : neighbors_)
 		{
 			std::vector<double> nCenter;
@@ -1069,7 +909,6 @@ void LCAdaptiveGridCell::logSamples()
 
 bool LCAdaptiveGridCell::checkIsNeighbor(const LCAdaptiveGridCell * other)
 {
-	//std::vector<double> otherRanges = other->ranges_;
 	int nParams = ranges_.size() / 2;
 	for (int i = 0; i < nParams; i++)
 	{
@@ -1088,23 +927,11 @@ bool LCAdaptiveGridCell::checkIsNeighbor(const LCAdaptiveGridCell * other)
 LCError LCAdaptiveGridCell::replaceNeighborWithChildren(LCAdaptiveGridCell* neighbor,
 	LCAdaptiveGridCell* child1, LCAdaptiveGridCell* child2)
 {
-	/*if (child1->ranges_[0] == -0.375 && child1->ranges_[1] == -0.3125 && child1->ranges_[2] == 0 && child1->ranges_[3] == 0.5)
-	{
-		std::cout << "found the child " << std::endl;
-		neighbor->log(0);
-		this->log(0);
-		system("pause");
-	}*/
-
 	int origSize = neighbors_.size();
 	neighbors_.remove(neighbor);
 	if (checkIsNeighbor(child1))
 	{
 		neighbors_.push_back(child1);
-		/*if (child1->ranges_[0] == -0.375 && child1->ranges_[1] == -0.3125 && child1->ranges_[2] == 0 && child1->ranges_[3] == 0.5)
-		{
-			std::cout << "found the child and added it" << std::endl;
-		}*/
 	}
 	if (checkIsNeighbor(child2))
 	{
@@ -1119,13 +946,6 @@ LCError LCAdaptiveGridCell::replaceNeighborWithChildren(LCAdaptiveGridCell* neig
 }
 void LCAdaptiveGridCell::addNeighbor(LCAdaptiveGridCell* neighbor)
 {
-	//if (neighbor->ranges_[0] == -0.375 && neighbor->ranges_[1] == -0.3125 && neighbor->ranges_[2] == 0 && neighbor->ranges_[3] == 0.5)
-	//{
-	//	std::cout << "found the neighbor " << std::endl;
-	//	neighbor->log(0);
-	//	this->log(0);
-	//	system("pause");
-	//}
 	neighbors_.push_back(neighbor);
 }
 

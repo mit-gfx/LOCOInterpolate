@@ -9,6 +9,7 @@
 #include "LCSampledFunction.h"
 #include "LCFunctionValue.h"
 #include <Eigen/Dense>
+#include "LCRealFunctionValue.h"
 #include <queue>
 #include <set>
 
@@ -16,27 +17,21 @@ LCAdaptiveGrid::LCAdaptiveGrid(LCFunction *parametricShape, LCBasisFunction::LCB
 	LCAdaptiveSamplingParams* params, bool evalCorners)
 
 {
-	std::cout << "first params constructor " << std::endl;
 	params->log();
 	params_ = params;
 	parametricShape_ = parametricShape;
-	std::cout << "threshold " << params_->maxTreeDepth_ << std::endl;
 	allowedError_ = params_->threshold_ * Eigen::VectorXd::Ones(1);
 	basisType_ = basisType;
 	maxLevel_ = params->maxTreeDepth_;
 	evalCorners_ = evalCorners;
 
 	// bootstrap step: uniform sampling 
-	std::cout << "doing bootstrap part" << std::endl;
-
 	LCError err = bootstrapSample(params_->bootstrapGridSize_);
 	if (!err.isOK())
 	{
 		std::cout << err.internalDescription() << std::endl;
 	}
 
-	std::cout << "doing adaptive part" << std::endl;
-	//remember to uncomment this:
 	err = adaptiveSample();
 	if (!err.isOK())
 	{
@@ -48,26 +43,22 @@ LCAdaptiveGrid::LCAdaptiveGrid(LCFunction *parametricShape, LCBasisFunction::LCB
 	Eigen::VectorXd allowedError, int bootstrapGridSize, int maxLevel, bool evalCorners)
 
 {
-	std::cout << "first constructor " << std::endl;
-	parametricShape_ = parametricShape;
-	allowedError_ = allowedError;
-	basisType_ = basisType;
-	maxLevel_ = maxLevel;
-	evalCorners_ = evalCorners;
-	LCAdaptiveSamplingParams* params = new LCAdaptiveSamplingParams();
+	LCAdaptiveSamplingParams* params = new LCAdaptiveSamplingParams(maxLevel, allowedError(0), bootstrapGridSize);
+	params->log();
 	params_ = params;
-	params_->log();
+	parametricShape_ = parametricShape;
+	allowedError_ = params_->threshold_ * Eigen::VectorXd::Ones(1);
+	basisType_ = basisType;
+	maxLevel_ = params->maxTreeDepth_;
+	evalCorners_ = evalCorners;
 
 	// bootstrap step: uniform sampling 
-
 	LCError err = bootstrapSample(bootstrapGridSize);
 	if (!err.isOK())
 	{
 		std::cout << err.internalDescription() << std::endl;
 	}
 
-	//std::cout << "doing adaptive part" << std::endl;
-	//remember to uncomment this:
 	err = adaptiveSample();
 	if (!err.isOK())
 	{
@@ -92,8 +83,6 @@ LCAdaptiveGrid::LCAdaptiveGrid(LCFunction *parametricShape, LCSampledFunction *c
 	}
 	maxLevel_ = maxLevel + parametricShape_->getNParams();
 	// bootstrap step: uniform sampling 
-	//std::cout << "doing adaptive part" << std::endl;
-
 	LCError err = adaptiveSample();
 	if (!err.isOK())
 	{
@@ -156,34 +145,9 @@ LCError LCAdaptiveGrid::getAdjacentCells(const std::vector<double> &params, std:
 
 	LCAdaptiveGridCell* aux;
 
-	/*std::cout << "basisCenter: ";
-	for (int i = 0; i < params.size(); i++)
-	{
-	std::cout << params[i] << " ";
-	};
-	std::cout << std::endl;*/
-
-	bool interestingBasis = false;
-	/*if ((std::abs(params[0] - 0.937509) < 0.000001) && (std::abs(params[1] - 0.875003) < 0.000001))
-	{
-	std::cout << "at the interesting basis center " << std::endl;
-	std::cout << "basisCenter: ";
-	interestingBasis = true;
-	for (int i = 0; i < params.size(); i++)
-	{
-	std::cout << params[i] << " ";
-	};
-	std::cout << std::endl;
-	}*/
-
 	LCError outsideSupport = root_->getAdjacentLeaves(params, result);
-	if (interestingBasis)
-	{
-		std::cout << "interesting basis center outsideSupport.isOK " << outsideSupport.isOK() << std::endl;
-	}
 
 	bool isOnBorder = false;
-	//std::cout << "border cell size " << borderCells_.size() << std::endl;
 	for (auto borderCell : borderCells_)
 	{
 		if (borderCell->evalPametersAreInCell(params).isOK())
@@ -193,14 +157,8 @@ LCError LCAdaptiveGrid::getAdjacentCells(const std::vector<double> &params, std:
 		}
 	}
 
-	if (interestingBasis)
-	{
-		std::cout << "interesting basis center on the border " << isOnBorder << std::endl;
-	}
-
 	if (!isOnBorder && !outsideSupport.isOK())
 	{
-		system("pause");
 		LCAdaptiveGridCell *leafCell;
 		LCError err2 = root_->getCointainingLeaf(params, &leafCell);
 		std::cout << "not on border and not outsideSupport basisCenter: ";
@@ -233,15 +191,12 @@ LCError LCAdaptiveGrid::getDoubleAdjacentCells(const std::vector<double> &params
 
 	for (auto adjCell : imediateAdjacenteLeaves)
 	{
-		//std::cout << "immediate adj: ";  adjCell->logRanges(0);
 		for (auto doubleNeighbor : adjCell->getNeighbors())
 		{
-		//	std::cout << "double adj: ";  doubleNeighbor->logRanges(0);
 			result->insert(doubleNeighbor);
 		}
 	}
 
-	//result->insert(result->end(), doubleAdjSet.begin(), doubleAdjSet.end());
 	return err;
 
 }
@@ -266,10 +221,13 @@ void LCAdaptiveGrid::setLeafInformation(LCAdaptiveGridCell* leafCell, const std:
 			leafSamples.push_back(sample);
 		}
 	}
+
 	LCFunctionValue *centerShapeInfo = nullptr;
 	std::vector<double> center;
 	leafCell->getCenter(&center);
+
 	parametricShape_->evalShapeInfo(parametricShape_->mapFromStandardHypercube(center), &centerShapeInfo);
+
 	leafCell->createHomeomorphicMap(centerShapeInfo, leafSamples);
 
 }
@@ -314,12 +272,14 @@ LCError LCAdaptiveGrid::bootstrapSample(int nLevels)
 
 	for (auto sampleCombination : sampleCombinations)
 	{
+		
 		Eigen::VectorXd alphaVec = sampleCombination.cast<double>() / (double)nSamples;
 		Eigen::VectorXd paramsVec = shapeMinRange.cwiseProduct(Eigen::VectorXd::Ones(nParams) - alphaVec) + shapeMaxRange.cwiseProduct(alphaVec);
 		std::vector<double> params;
 		LCMathHelper::eigen2StdVector(paramsVec, &params);
 		LCFunctionValue* shapeInfo = nullptr;
 		LCErrorReturn(parametricShape_->evalShapeInfo(parametricShape_->mapFromStandardHypercube(params), &shapeInfo));
+
 		switch (basisType_)
 		{
 		case LCBasisFunction::LCBasisFunctionType::LINEAR_BSPLINE:
@@ -350,16 +310,14 @@ LCError LCAdaptiveGrid::bootstrapSample(int nLevels)
 	}
 
 	root_ = new LCAdaptiveGridCell(0, nullptr, ranges);
-
 	LCErrorReturn(bootstrapUniformSplit(root_, 0, nLevels));
-
 	std::vector<LCAdaptiveGridCell*> leafCells;
 	root_->getAllLeafCells(&leafCells);
+	
 	for (int i = 0; i < leafCells.size(); i++)
 	{
 		setLeafInformation(leafCells[i], samples_);
 	}
-
 
 	if (basisType_ == LCBasisFunction::LCBasisFunctionType::CUBIC_BSPLINE)
 	{
@@ -371,8 +329,6 @@ LCError LCAdaptiveGrid::bootstrapSample(int nLevels)
 		{
 			Eigen::VectorXd alphaVec = (corner.cast<double>() - Eigen::VectorXd::Ones(nParams)) / (double)nSamples;
 			Eigen::VectorXd sampleCenter = shapeMinRange.cwiseProduct(Eigen::VectorXd::Ones(nParams) - alphaVec) + shapeMaxRange.cwiseProduct(alphaVec);
-			//std::cout << "corner sample center = " << sampleCenter.transpose() << std::endl;
-			//std::cout << "corner alphaVec = " << alphaVec.transpose() << std::endl;
 			Eigen::VectorXd projectedCorner = corner.cast<double>() - Eigen::VectorXd::Ones(nParams);
 			for (int i = 0; i < nParams; i++)
 			{
@@ -391,16 +347,12 @@ LCError LCAdaptiveGrid::bootstrapSample(int nLevels)
 			LCSample* sampleReference;
 			LCErrorReturn(this->getSample(sampleRefereceCenter, &sampleReference));
 			LCFunctionValue* refereceShapeInfo = sampleReference->getShapeInfo();
-			//std::cout << "this is evalCorners_ " << evalCorners_ << std::endl;
 			if (evalCorners_)
 			{
-				//std::cout << "this is the reference shape info before the if block " << refereceShapeInfo << std::endl;
 				std::vector<double> sampleCenterVec;
 				LCMathHelper::eigen2StdVector(sampleCenter, &sampleCenterVec);
 
 				LCErrorReturn(parametricShape_->evalShapeInfo(parametricShape_->mapFromStandardHypercube(sampleCenterVec), &refereceShapeInfo));
-
-				//std::cout << "this is the reference shape info after the if block " << refereceShapeInfo << std::endl;
 			}
 			LCSample* precomputedSample = new LCSample(sampleCenter, basisFunction, refereceShapeInfo);
 			samples_.push_back(precomputedSample);
@@ -421,9 +373,7 @@ LCError LCAdaptiveGrid::bootstrapSample(int nLevels)
 				cellRanges[2 * i] = cellMin(i);
 				cellRanges[2 * i + 1] = cellMax(i);
 			}
-			//std::cout << "cellMin = " << cellMin.transpose() << " cell max = " << cellMax.transpose() << std::endl;
 			LCAdaptiveGridCell * borderCell = new LCAdaptiveGridCell(-1, nullptr, cellRanges);
-			//std::cout << "new corner cell : "; borderCell->logRanges(0);
 			Eigen::VectorXd cellCenter = 0.5*(cellMin + cellMax);
 			std::vector<double> cellCenterVec;
 			LCMathHelper::eigen2StdVector(cellCenter, &cellCenterVec);
@@ -438,7 +388,6 @@ LCError LCAdaptiveGrid::bootstrapSample(int nLevels)
 					std::vector<double> sampleCenter;
 					LCMathHelper::eigen2StdVector(sample->getCenter(), &sampleCenter);
 					root_->getAdjacentLeaves(sampleCenter, &neighbours);
-					//std::cout << sample->getCenter() << std::endl;
 				}
 			}
 			std::vector<double> borderCellCenter;
@@ -551,7 +500,6 @@ LCError LCAdaptiveGrid::adaptiveSample()
 	while (!cellProcessingQueue.empty())
 	{
 		LCAdaptiveGridCell* cell = cellProcessingQueue.top();
-		std::cout << "checking cell ";  cell->logRanges(0);
 		cellProcessingQueue.pop();
 		auto processingStatus = hasBeenProcessed.find(cell);
 		if (processingStatus != hasBeenProcessed.end())
@@ -564,7 +512,6 @@ LCError LCAdaptiveGrid::adaptiveSample()
 
 		bool doSplit;
 		LCErrorReturn(decideSplit(cell, &doSplit));
-		//std::cout << "deciding to split a cell that points in direction " << cell->getSplitDirection() << std::endl;
 		if (doSplit)
 		{
 			int nextDirection;
@@ -576,8 +523,6 @@ LCError LCAdaptiveGrid::adaptiveSample()
 			{
 				return err;
 			}
-
-			//std::cout << "pushing a cell that points in direction " << cell->getChild1()->getSplitDirection() << std::endl;
 
 			cellProcessingQueue.push(cell->getChild1());
 			hasBeenProcessed[cell->getChild1()] = false;
@@ -606,16 +551,13 @@ LCError LCAdaptiveGrid::decideSplitDirection(LCAdaptiveGridCell *cell, int *dire
 	switch (params_->splitPolicy_)
 	{
 	case LCAdaptiveSamplingParams::LCSplitPolicy::CYCLIC:
-		// an alternative is to always split in a direction orthogonal to the previous split
+		// always split in a direction orthogonal to the previous split
 		*direction = (cell->getParent()->getSplitDirection() + 1) % 2;
-	//	std::cout << "decide split direction cyclic" << params_->splitPolicy_ << std::endl;
 		break;
 	case LCAdaptiveSamplingParams::LCSplitPolicy::ERROR_BASED:
 		LCErrorReturn(cell->getOptimalSplitDirection(direction));
-//		std::cout << "decide split direction errorBased" << params_->splitPolicy_ << std::endl;
 		break;
 	default:
-		//std::cout << "decide split direction default" << params_->splitPolicy_ << std::endl;
 		break;
 	}
 	return LCError();
@@ -688,32 +630,6 @@ LCError LCAdaptiveGrid::decideSplit(LCAdaptiveGridCell* cell, bool *splitDecisio
 
 LCError LCAdaptiveGrid::refineCell(LCAdaptiveGridCell* cell, int splitDirection, std::vector<LCAdaptiveGridCell*> *affectedCells)
 {
-	//std::cout << "before split" << std::endl;
-	//checkViolatesLocality();
-
-	///czw debug
-	std::cout << "going to split cell " << std::endl;
-	cell->logRanges(0);
-	//checkViolatesLocality();
-
-	/*std::vector<double> ranges;
-	ranges = cell->ranges_;
-	if (ranges[0] == 0.5 && ranges[1] == 1 && ranges[2] == 0.875 && ranges[3] == 1)
-	{
-	std::cout << "refining the troublesome cell " << std::endl;
-	cell->log(0);
-	for (auto sample : samples_)
-	{
-	Eigen::VectorXd samCenter = sample->getCenter();
-	if (samCenter(0) == 0.5 && samCenter(1) == 0.75)
-	{
-	std::cout << "found the troublesome sample" << std::endl;
-	std::cout << "troublesome sample basis function size: " << sample->getBasisFunctions().size() << std::endl;
-	sample->log();
-	}
-	}
-	}*/
-	////czw debug
 
 	LCError err;
 	//--- step1: add new samples
@@ -727,9 +643,7 @@ LCError LCAdaptiveGrid::refineCell(LCAdaptiveGridCell* cell, int splitDirection,
 
 	for (auto midValue : midValues)
 	{
-		//std::cout << "mid sample at: " << midValue.transpose() << std::endl;
 		LCSample* midSample;
-		//cell->logSamples();
 		if (!cell->getSample(midValue, &midSample).isOK())
 		{
 			LCFunctionValue *shapeInfo = nullptr;
@@ -739,7 +653,6 @@ LCError LCAdaptiveGrid::refineCell(LCAdaptiveGridCell* cell, int splitDirection,
 			midSample = new LCSample(midValue, shapeInfo);
 			samples_.push_back(midSample);
 			newMidSamples.push_back(midSample);
-			//std::cout << "----added mid sample" << std::endl;
 		}
 		midSamples.push_back(midSample);
 	}
@@ -771,11 +684,9 @@ LCError LCAdaptiveGrid::refineCell(LCAdaptiveGridCell* cell, int splitDirection,
 
 	//refine all the basis functions
 	std::vector<std::pair<LCBasisFunction*, LCSample*>> removedFunctions;
-	//std::cout << " desiredSupport(splitDirection)" << desiredSupport(splitDirection) << std::endl;
 	int nRefines = 0;
 	for (auto sample : samplesAffectingCell)
 	{
-		//std::cout << "sample affecting cell " << sample->getCenter().transpose() << std::endl;
 		LCErrorReturn(sample->refineBasisFunctions(cell, splitDirection, desiredSupport(splitDirection), basisType_, &nRefines));
 	}
 
@@ -801,22 +712,6 @@ LCError LCAdaptiveGrid::refineCell(LCAdaptiveGridCell* cell, int splitDirection,
 
 
 	// remove all the basis functions that do not get us locality 
-
-	/*
-	std::set<LCAdaptiveGridCell*> totalSupport;
-	for (auto adj : cell->getChild1()->getNeighbors())
-	{
-	totalSupport.insert(adj);
-	}
-	for (auto adj : cell->getChild2()->getNeighbors())
-	{
-	totalSupport.insert(adj);
-	}
-	totalSupport.insert(cell->getChild1());
-	totalSupport.insert(cell->getChild2());
-	*/
-
-	//czw debug
 	std::set<LCAdaptiveGridCell*> totalSupport;
 	this->getAllCellsInTheWorld(root_, &totalSupport);
 	std::vector<LCAdaptiveGridCell*> padding = getBorderCells();
@@ -824,7 +719,6 @@ LCError LCAdaptiveGrid::refineCell(LCAdaptiveGridCell* cell, int splitDirection,
 	{
 		totalSupport.insert(padCell);
 	}
-	//czw debug
 
 	if (basisType_ == LCBasisFunction::LCBasisFunctionType::CUBIC_BSPLINE)
 	{
@@ -841,15 +735,6 @@ LCError LCAdaptiveGrid::refineCell(LCAdaptiveGridCell* cell, int splitDirection,
 	int nBreakLocalityn = 0;
 	//for each sample that is affecting the cell being refined, check if that sample is violating locality. 
 	//Take the basis functions associated with that sample and remove them from the sample. Add them to a list. 
-	for (auto sample : samplesAffectingCell)
-	{
-		/*if (sample->getCenter()(0) == -0.125 && sample->getCenter()(1) == 0)
-		{
-			std::cout << "check 1" << std::endl;
-			sample->log();
-			system("pause");
-		}*/
-	}
 	for (auto sample : samplesAffectingCell)
 	{
 
@@ -880,15 +765,6 @@ LCError LCAdaptiveGrid::refineCell(LCAdaptiveGridCell* cell, int splitDirection,
 			for (auto supportCell : totalSupport)
 			{
 				//if a cell from this "reduced world" is not an adjacent cell
-				if (center(0) == -0.25 && center(1) == 0 && support(0) == 0.125 && support(1) == 0.125 
-					&& supportCell->ranges_[0] == -0.375 && supportCell->ranges_[1] == -0.3125 && supportCell->ranges_[2] == 0 && supportCell->ranges_[3] == 0.5)
-				{
-				//	std::cout << "here" << std::endl;
-				//	std::cout << sampleCenter.transpose() << std::endl;
-				//	basisFunction.second->log();
-				//	supportCell->log(0);
-				//	system("pause");
-				}
 				auto adj = adjacentCells.find(supportCell);
 				if (adj == adjacentCells.end())
 				{
@@ -916,7 +792,7 @@ LCError LCAdaptiveGrid::refineCell(LCAdaptiveGridCell* cell, int splitDirection,
 					{
 						supportCell->log(0);
 					}
-					std::cout << "adj cell sfor sample " << sample->getCenter().transpose() << std::endl;
+					std::cout << "adj cells for sample " << sample->getCenter().transpose() << std::endl;
 					for (auto supportCell : adjacentCells)
 					{
 						supportCell->log(0);
@@ -947,16 +823,6 @@ LCError LCAdaptiveGrid::refineCell(LCAdaptiveGridCell* cell, int splitDirection,
 		}
 	}
 
-	//for (auto sample : samplesAffectingCell)
-	//{
-	//	if (sample->getCenter()(0) == -0.125 && sample->getCenter()(1) == 0)
-	//	{
-	//		std::cout << "check 2" << std::endl;
-	//		sample->log();
-	//		system("pause");
-	//	}
-	//}
-
 	//Group all of the removed basis functions for reallocation 
 	std::unordered_map<LCBasisFunctionKey, GroupFunctionInfo*> groupedBasisFunctions;
 	for (auto basisFunction : removedFunctions)
@@ -980,30 +846,13 @@ LCError LCAdaptiveGrid::refineCell(LCAdaptiveGridCell* cell, int splitDirection,
 			groupedBasisFunction = new GroupFunctionInfo();
 			groupedBasisFunctions[bfKey] = groupedBasisFunction;
 		}
-
-	/*	if (basisFunction.second->getCenter()(1) < 0.005 && basisFunction.second->getCenter()(1) > 0)
-		{
-			std::cout << "found a small grouped function while removing" << std::endl;
-			std::cout << basisFunction.second->getCenter().transpose() << std::endl;
-			system("pause");
-		}*/
-
 		groupedBasisFunction->add(basisFunction.second, basisFunction.first->getWeight());
 
 		delete basisFunction.first;
 	}
-	//for (auto sample : samplesAffectingCell)
-	//{
-	//	if (sample->getCenter()(0) == -0.125 && sample->getCenter()(1) == 0)
-	//	{
-	//		std::cout << "check 3" << std::endl;
-	//		sample->log();
-	//		system("pause");
-	//	}
-	//}
 
 	//Looping through all the samples and adding it to the groupedBasisFunctions
-	for (auto sample : samples_)//remember to change this back
+	for (auto sample : samples_)//CURRENTLY LOOPS THROUGH ALL SAMPLES IN GRID
 	{
 		err = (sample->extractGroupBasisFunctions(&groupedBasisFunctions));
 		if (!err.isOK())
@@ -1014,32 +863,13 @@ LCError LCAdaptiveGrid::refineCell(LCAdaptiveGridCell* cell, int splitDirection,
 
 	}
 
-	//for (auto sample : samplesAffectingCell)
-	//{
-	//	if (sample->getCenter()(0) == -0.125 && sample->getCenter()(1) == 0)
-	//	{
-	//		std::cout << "check 4" << std::endl;
-	//		sample->log();
-	//		system("pause");
-	//	}
-	//}
-
 	for (auto basisFunction : groupedBasisFunctions)
 	{
 		std::vector<double> basisCenter;
-		/*if (basisFunction.second->getCenter()(1) < 0.005 && basisFunction.second->getCenter()(1) > 0)
-		{
-			std::cout << "found a small grouped function" << std::endl;
-			std::cout << basisFunction.second->getCenter().transpose() << std::endl;
-			system("pause");
-		}*/
+		
 		LCMathHelper::eigen2StdVector(basisFunction.second->getCenter(), &basisCenter);
 		std::vector<std::pair<LCSample*, double>> replacingWeights;
-	/*	if (basisCenter[0] == -0.25 && basisCenter[1] == 0)
-		{
-			std::cout << " basis of interest " << std::endl;
-			system("pause");
-		}*/
+
 		err = (getReplacingSamples(basisCenter, basisFunction.second->getCenter(), &extraMidSamples, &replacingWeights));
 		if (!err.isOK())
 		{
@@ -1051,13 +881,6 @@ LCError LCAdaptiveGrid::refineCell(LCAdaptiveGridCell* cell, int splitDirection,
 		{
 			if (replacingWeight.second > 0)
 			{
-				/*if (replacingWeight.first->getCenter()(0) == -0.125 && replacingWeight.first->getCenter()(1) == 0)
-				{
-					std::cout << "here in the replacing weihgt" << std::endl;
-					replacingWeight.first->log();
-					system("pause");
-				}*/
-
 				LCBasisFunction* newBasisFunction;
 				err = (LCBasisFunction::newFromCopyKey(basisFunction.first, basisFunction.second->getWeight()* replacingWeight.second, &newBasisFunction));
 				if (!err.isOK())
@@ -1070,16 +893,6 @@ LCError LCAdaptiveGrid::refineCell(LCAdaptiveGridCell* cell, int splitDirection,
 		}
 		delete basisFunction.second;
 	}
-
-	//for (auto sample : samplesAffectingCell)
-	//{
-	//	if (sample->getCenter()(0) == -0.125 && sample->getCenter()(1) == 0)
-	//	{
-	//		std::cout << "check 5" << std::endl;
-	//		sample->log();
-	//		system("pause");
-	//	}
-	//}
 
 	//--- step 5: add the extra mid samples
 	for (auto midSample : extraMidSamples)
@@ -1098,11 +911,6 @@ LCError LCAdaptiveGrid::refineCell(LCAdaptiveGridCell* cell, int splitDirection,
 			}
 		}
 	}
-
-	std::cout << "finish split" << std::endl;
-	//cell->getChild1()->log(0);
-	//cell->getChild2()->log(0);
-	//checkViolatesLocality();
 
 	return err;
 }
@@ -1174,21 +982,12 @@ LCError LCAdaptiveGrid::checkViolatesLocality()
 						localityIsBroken = true;
 						std::cout << "locality violated for sample: " << sample->getCenter().transpose() << std::endl;
 						sample->log();
-						//system("pause");
+						system("pause");
 						std::cout << "cell which is influenced by the sample, but shouldn't be" << std::endl;
 						supportCell->log(0);
-					/*	std::cout << "sample's adjacent cells" << std::endl;
-						for (auto adjCell : adjacentCells)
-						{
-							adjCell->logRanges(0);
-						}*/
-						//basisFunction.second->checkRegionOverlap(supportCell->ranges_);
-						//logAncestors(supportCell);
 						system("pause");
 						basisFunction.second->log();
-						//root_->log(0);
 						err = LCError("locality is broken");
-						//break;
 					}
 				}
 			}
@@ -1257,7 +1056,6 @@ LCError LCAdaptiveGrid::getReplacingSamples(std::vector<double> basisCenter, Eig
 			}
 			std::cout << std::endl;
 			std::cout << "replacement center = " << replacementCenter.transpose() << std::endl;
-			//return LCError("cannot do linear precsion");
 			system("pause");
 			canDoLinearPrecision = false;
 			break;
@@ -1292,29 +1090,6 @@ LCError LCAdaptiveGrid::getReplacingSamples(std::vector<double> basisCenter, Eig
 			{
 				weight *= (1 - alphaParam);
 			}
-			/*if (weight < 0.001 && weight > 0)
-			{
-				std::cout << "\nsmall weight "<< weight << std::endl;
-				std::cout << "area " << area << " alpha " << alphaParam << std::endl;
-				std::cout << "i " << i << std::endl;
-				double product = (replacementCenter[i] - interRanges[2 * i]) / area;
-				std::cout << "product " << product << std::endl;
-				std::cout << "combination " << combination.transpose() << std::endl;
-				Eigen::VectorXd interRangesVec;
-				LCMathHelper::std2EigenVector(interRanges, &interRangesVec);
-				std::cout << "interRanges " << interRangesVec.transpose() << std::endl;
-				std::cout << "replacementCenter " << replacementCenter.transpose() << std::endl;
-				Eigen::VectorXd sampleCenter = combination.cast<double>().cwiseProduct(maxRange)
-					+ (Eigen::VectorXd::Ones(nParams) - combination.cast<double>()).cwiseProduct(minRange);
-				std::cout << "sample center " << sampleCenter.transpose() << std::endl;
-				std::cout << "basis center " << basisCenter[0] << " " << basisCenter[1] << std::endl;
-				std::cout << "adjacent cells " << std::endl;
-				for (auto cell : adjacenteCells)
-				{
-					cell->log(0);
-				}
-				system("pause");
-			}*/
 		}
 		if (weight > 0)
 		{
@@ -1322,19 +1097,6 @@ LCError LCAdaptiveGrid::getReplacingSamples(std::vector<double> basisCenter, Eig
 			Eigen::VectorXd sampleCenter = combination.cast<double>().cwiseProduct(maxRange)
 				+ (Eigen::VectorXd::Ones(nParams) - combination.cast<double>()).cwiseProduct(minRange);
 			LCSample *sample;
-			//if (sampleCenter(0) == -0.125 && sampleCenter(1) == 0)
-			//{
-			//	std::cout << "sample center " << sampleCenter.transpose() << std::endl;
-			//	std::cout << "combination " << sampleCenter.transpose() << std::endl;
-			//	std::cout << "basis center" << basisCenter[0] << " " << basisCenter[1] << std::endl;
-			//	std::cout << "weight " << weight << std::endl;
-			//	std::cout << "adjacent cells " << std::endl;
-			//	for (auto cell : adjacenteCells)
-			//	{
-			//		cell->log(0);
-			//	}
-			//	system("pause");
-			//}
 			err = (getSample(sampleCenter, &sample));
 			if (!err.isOK())
 			{
@@ -1346,7 +1108,6 @@ LCError LCAdaptiveGrid::getReplacingSamples(std::vector<double> basisCenter, Eig
 				sample = new LCSample(sampleCenter, shapeInfo);
 				samples_.push_back(sample);//bookmark
 				extraMidSamples->push_back(sample);
-				//std::cout << " added mid sample at " << sampleCenter.transpose() << std::endl;
 			}
 			replacingWeights->push_back(std::make_pair(sample, weight));
 		}
@@ -1421,11 +1182,6 @@ LCError LCAdaptiveGrid::evalShapeInfoUsingAllSamples(const std::vector<double> &
 			std::cout << err.internalDescription();
 			return err;
 		}
-		/*if (weight > 0)
-		{
-
-		std::cout << "sample center = " << sample.first->getCenter().transpose() << std::endl;
-		}*/
 		weightSum += weight;
 		weightedSamples.push_back(std::make_pair(weight, sample.second));
 	}

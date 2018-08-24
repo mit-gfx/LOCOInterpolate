@@ -51,12 +51,10 @@ int LCSampledFunction::getNParams() const
 }
 double LCSampledFunction::getMinRange(int iParam) const
 {
-	//std::cout << "get min range " << ranges_[2 * iParam] << std::endl;
 	return ranges_[2 * iParam];
 }
 double LCSampledFunction::getMaxRange(int iParam) const
 {
-	//std::cout << "get max range " << ranges_[2 * iParam + 1] << std::endl;
 	return ranges_[2 * iParam + 1];
 }
 
@@ -70,37 +68,11 @@ LCError LCSampledFunction::evalDeriv(const std::vector<double> &shapeParams, int
 
 LCError LCSampledFunction::evalShapeInfo(const std::vector<double> &shapeParams, LCFunctionValue **result)
 {
-	/*std::cout << "here in the eval shape info function" << std::endl; 
-	for (int i = 0; i < shapeParams.size(); i++)
-	{
-		std::cout << shapeParams[i] << " ";
-	}
-	std::cout << std::endl;*/
-
 	auto params = mapToStandardHypercube(shapeParams);
-
-	//std::cout << "after mapping to standard hypercube " << std::endl;
-	//for (int i = 0; i < params.size(); i++)
-	//{
-	//	std::cout << params[i] << " ";
-	//}
-	//std::cout << std::endl;
 
 	LCAdaptiveGridCell *containingCell = nullptr;
 	LCErrorReturn(root_->getCointainingLeaf(params, &containingCell));//added by czw params -> shapeParams
-	//std::cout << "made it past the containing leaf" << std::endl; 
 	LCErrorReturn(containingCell->evalShapeInfo(params, basisType_, result));
-	//std::cout << "here in the eval shape info function" << std::endl; //remember to ask about this!
-	//LCFunctionValue * tetResult = *result; //used to have a cast here
-	/*
-	if (tetResult->isTetCAD())
-	{
-		LCFunctionValue* centerShapeInfo = containingCell->getCenterShapeInfo();
-		
-		centerShapeInfo->getMesh().getSurfaceMesh();
-		tetResult->getMesh().triMesh = centerShapeInfo->getMesh().triMesh;
-	}
-	*/
 
 	return LCError();
 }

@@ -21,13 +21,6 @@ public:
 	virtual void addNewPrecomputedPhysics(std::string name, std::vector<double> &values) = 0;
 	virtual void clearAllPhysics() = 0;
 	virtual void log() = 0;
-	//virtual bool isTetCAD() = 0;
-	//virtual int nPhysics() = 0;
-	//virtual OCTetMesh getMesh() = 0;
-	//virtual void addVertex(Eigen::Vector3d *vertex) = 0;
-	//virtual void addTet(Eigen::Vector4i *vertex) = 0;
-	//virtual void addBoundaryCondition(OCBoundaryCondition *boundaryCondition) = 0;
-	//virtual void addPrecomputedPhysics(OCPrecomputedPhysics *precomputedPhysic) = 0;
 };
 
 

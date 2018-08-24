@@ -36,14 +36,6 @@ LCSample::LCSample(const Eigen::VectorXd center, LCFunctionValue *shapeInfo)
 
 void LCSample::removeBasisFucntion(LCBasisFunction* basisFunction)
 {
-	//LCBasisFunctionKey inputKey(basisFunction);
-	//auto bfMap = basisFunctions_.find(inputKey);
-	//if (bfMap != basisFunctions_.end())
-	//{
-	//	bfMap->second->setWeightToZero();
-	//}
-
-
 
 	LCBasisFunctionKey inputKey(basisFunction);
 	auto bfMap = basisFunctions_.find(inputKey);
@@ -164,10 +156,8 @@ LCError LCSample::refineBasisFunctions(LCAdaptiveGridCell *cell, int dir, double
 	// if not, we check if it's on the right or left side of the split and get the region that this sample can no longer cover
 	//std::vector<std::vector<double>> uncoveredRegions;
 	//LCErrorReturn(cell->getAffectedRangeWhenSplitting(getCenter(), dir, basisType, &uncoveredRegions));
-	//std::cout << "going to refine basis functions total of " << basisFunctions.size() << std::endl;
 	//refine all the basis functions inside the cell
 
-	//std::cout << "refining sample centered at " << center_.transpose() << " basis functions remoced:" << std::endl;
 	std::vector<LCBasisFunction*> newBasisFunctions;
 	std::vector<LCBasisFunctionKey> basisFunctionToRemove;
 
@@ -193,19 +183,16 @@ LCError LCSample::refineBasisFunctions(LCAdaptiveGridCell *cell, int dir, double
 		newBasisFunctions.push_back(basisFunction.second);
 		//basisFunction->refine(dir, &newBasisFunctions);
 	}
-	//std::cout << "removed basis funcitons" << std::endl;
 	for (auto newBasisFunction : basisFunctionToRemove)
 	{
 		//basisFunctions_.find(newBasisFunction)->second->log();
 		basisFunctions_.erase(newBasisFunction);
 	}
-	//std::cout << "added basis funcitons" << std::endl;
 	for (auto newBasisFunction : newBasisFunctions)
 	{
 		//newBasisFunction->log();
 		this->addBasisFunction(newBasisFunction);
 	}
-	//std::cout << "done with  basis funcitons" << std::endl;
 
 	// for each of the basis functions that are in the uncoveredRegion
 	// remove and add weight to the replacingSamples
@@ -225,22 +212,10 @@ LCError LCSample::extractGroupBasisFunctions(std::unordered_map<LCBasisFunctionK
 		if (bfMap != basisFunctions_.end())
 		{
 			LCBasisFunction * basisFunc = bfMap->second;
-		/*	if (basisFunc->getWeight()<0.0005)
-			{
-				std::cout << "small weight basisFunc " << basisFunc->getWeight() << std::endl;
-				system("pause");
-			}*/
 			vis.second->add(this, basisFunc->getWeight());
 			remBasisFunctions.push_back(basisFunc);
-
-			//std::cout << "addin for sample " << this->getCenter().transpose() << " bf: "; basisFunc->log();
 		}
 	}
-	//if (remBasisFunctions.size() > 0)
-	//{
-	//	std::cout << "found bf" << std::endl;
-	//	system("pause");
-	//}
 
 	for (auto basisFunction : remBasisFunctions)
 	{

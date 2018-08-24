@@ -24,7 +24,6 @@ struct LCAdaptiveSamplingParams
 	LCAdaptiveSamplingParams(int maxTreeDepth = 0, double allowedError = 0.5, 
 		int bootstrap = 0, int errorSamples = 0, LCSplitPolicy policy = LCSplitPolicy::ERROR_BASED, LCErrorMetric errorMetric=LCErrorMetric::CENTER_BASED )
 	{
-		std::cout << "lc adaptive sampling constructor" << std::endl;
 		splitPolicy_ = policy;
 		maxTreeDepth_ = maxTreeDepth;
 		threshold_ = allowedError;
