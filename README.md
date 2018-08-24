@@ -46,9 +46,9 @@ Download and install Google protobuf v3.1.0 according to these directions https:
 
 **NOTE** - Build protobuf using a Win64 generator.
 
-**NOTE** - Set the runtime library to Multi-threaded DLL /MD. In VisualStudio this can be done by Properties -> Configuration Properties -> C/C++ -> Code Generation -> Runtime Library -> Multi-threaded DLL /MD. If building in debug mode, then set the runtime library to Multi-threaded DLL debug /MDd.
+**NOTE** - Set the runtime library to Multi-threaded DLL /MD. In VisualStudio this can be done by Properties -> Configuration Properties -> C/C++ -> Code Generation -> Runtime Library -> Multi-threaded DLL /MD. Similarly, when building in debug mode, set the runtime library to Multi-threaded DLL debug /MDd.
 
-Place the libprotobuf.lib file in 
+Place the libprotobuf.lib and libprotobufd.lib files in 
 ```
 LOCOInterpolate/libs/protobuf/lib
 ```
