@@ -295,7 +295,7 @@ LCError protoTest()
 		}
 		sampleBases = sampleBases && identicalBases;
 	}
-	std::cout << "Checking proto basis functions..." << std::endl;
+	std::cout << "Testing stored proto basis functions..." << std::endl;
 
 	if (sampleBases)
 	{
@@ -467,11 +467,10 @@ int main(int argc, char* argv[])
 		bool optimalDirection = true;
 
 		LCAdaptiveSamplingParams params(maxDepth, threshold, bootstrap, errorSample);
-		std::cout << "\nRunning LOCOInterpolate with the following parameters. See LCAdaptiveSamplingParams.h for details." << std::endl;
+		std::cout << "\n\nRunning LOCOInterpolate with the following parameters. See LCAdaptiveSamplingParams.h for details." << std::endl;
 		std::cout << "\tthreshold " << threshold << "\n\tmax depth " << maxDepth 
 				  << "\n\tbootstrap " << bootstrap << "\n\terror samples " << errorSample 
 				  << "\n\toptimal direction " << optimalDirection << "\n..."<<std::endl;
-
 		std::string name = "cubic" + std::string("_thresh_") + std::to_string(threshold) + std::string("_maxDepth_") + std::to_string(maxDepth) + std::string("_bootstrap_") + std::to_string(bootstrap);
 		testFunctionLinearApproximation(params, LCBasisFunction::LCBasisFunctionType::CUBIC_BSPLINE, name, 100);
 	}
