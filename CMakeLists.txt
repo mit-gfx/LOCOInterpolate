@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 set (CMAKE_CXX_STANDARD 11)
-project(InstantCAD)
+project(LOCOInterpolate)
 
 message(STATUS "Setting MSVC flags")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHc /std:c++latest")
