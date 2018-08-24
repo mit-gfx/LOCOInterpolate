@@ -17,7 +17,6 @@ LCAdaptiveGrid::LCAdaptiveGrid(LCFunction *parametricShape, LCBasisFunction::LCB
 	LCAdaptiveSamplingParams* params, bool evalCorners)
 
 {
-	params->log();
 	params_ = params;
 	parametricShape_ = parametricShape;
 	allowedError_ = params_->threshold_ * Eigen::VectorXd::Ones(1);
@@ -44,7 +43,6 @@ LCAdaptiveGrid::LCAdaptiveGrid(LCFunction *parametricShape, LCBasisFunction::LCB
 
 {
 	LCAdaptiveSamplingParams* params = new LCAdaptiveSamplingParams(maxLevel, allowedError(0), bootstrapGridSize);
-	params->log();
 	params_ = params;
 	parametricShape_ = parametricShape;
 	allowedError_ = params_->threshold_ * Eigen::VectorXd::Ones(1);

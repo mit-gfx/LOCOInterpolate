@@ -57,7 +57,6 @@ LCError compareVectors(std::vector<double> vec1, std::vector<double> vec2, doubl
 		maxError = std::max({ maxError, cellError });
 	}
 	double averageError = error / vec1.size();
-	std::cout << "max error " << maxError << " averageError " << averageError << std::endl;
 	return LCError();
 }
 
@@ -143,8 +142,6 @@ LCError outputMatrix(LCFunction* shape, int imageResolution, std::string inputFi
 }
 
 LCError outputMatrixSamples(std::vector<LCSample*> *samples, std::string inputFileName, int width = 5){
-	std::cout << inputFileName << std::endl;
-
 	std::vector<double> values(width * width);
 
 	std::vector<unsigned char> image;
@@ -178,7 +175,6 @@ LCError outputMatrixSamples(std::vector<LCSample*> *samples, std::string inputFi
 		int y = (center[1] + -1.0*minCoordY) / (maxCoordY - minCoordY) * (width - 1);
 		values[y*width + x] = 255;
 	}
-	std::cout << "minCoord X" << minCoordX << " minCoordY " << minCoordY << " maxCoordX " << maxCoordX << " maxCoordY " << maxCoordY << std::endl;
 
 	colorData(&values, &image, width, true);
 	encodeOneStep(inputFileName.c_str(), image, width, width);
@@ -190,14 +186,11 @@ LCError testFunctionLinearApproximation(LCAdaptiveSamplingParams params, LCBasis
 {
 
 	LCRealFunction* originFunction = new LCRealFunction(2, false);//A function that is RxR -> R
-	std::cout << "params error samples " << params.nErrorSamples_ << std::endl;
-	params.log();
 	LCAdaptiveGrid grid(originFunction, basisType, &params, true);//The kd-tree data structure used to store the sampled function
 	std::vector<double> ranges;
 	originFunction->getRanges(&ranges);
 	LCSampledFunction* approxFunction = new LCSampledFunction(grid.getRoot(), ranges, grid.getSamples(), grid.getBorderCells());//The interpolated function
 
-	std::cout << "number of samples " << grid.getSamples().size() << std::endl;
 	std::vector<LCSample*> samples = grid.getSamples();
 
 	for (int i = 0; i < samples.size(); i++)
@@ -210,6 +203,9 @@ LCError testFunctionLinearApproximation(LCAdaptiveSamplingParams params, LCBasis
 	outputMatrix(originFunction, 20, outName + "_origin.png", &exactVals);
 	outputMatrix(approxFunction, 20, outName + "_approx.png", &approxVals);
 	outputMatrixSamples(&samples, outName + "_samples.png", width);
+	std::cout << "Done \nA visualization of the original function has been written to: " << outName + "_origin.png"
+		<< "\nA visualization of the interpolated function has been written to: " << outName + "_approx.png"
+		<< "\nA visualization of the samples has been written to: " << outName + "_samples.png" << std::endl;
 	compareVectors(exactVals, approxVals, 0.1);//Compare the sampled values of the original function and the approximated function
 	return LCError();
 }
@@ -217,6 +213,7 @@ LCError testFunctionLinearApproximation(LCAdaptiveSamplingParams params, LCBasis
 //Test whether parametric shapes can be read and written as proto messages
 LCError protoTest()
 {
+	std::cout << "\nTesting proto storage..." << std::endl;
 	std::string outFileName = "oneDimensionalTestCmake.proto";
 	int nParams = 2;
 	LCError err;
@@ -263,14 +260,14 @@ LCError protoTest()
 	std::vector<double> protoWriteValues;
 	outputMatrix(outputPrecomputedShape, 10, "readFromProto.png", &protoReadValues);
 	outputMatrix(shape, 10, "writtenToProto.png", &protoWriteValues);
-	std::cout << "Testing stored proto sample values" << std::endl;
+	std::cout << "Testing stored proto sample values..." << std::endl;
 	LCError comparison = compareVectors(protoReadValues, protoWriteValues, 0.1);//compare the written and read sample values
 	if (comparison.isOK()){
-		std::cout << "proto sample values are correct" << std::endl;
+		std::cout << "	Proto sample values are correct" << std::endl;
 	}
 	else
 	{
-		std::cout << "proto sample values are incorrect" << std::endl;
+		std::cout << "	Proto sample values are incorrect" << std::endl;
 	}
 
 	//Compare the basis functions of the original shape to the samples of the shape that were read from the proto message
@@ -298,13 +295,15 @@ LCError protoTest()
 		}
 		sampleBases = sampleBases && identicalBases;
 	}
+	std::cout << "Checking proto basis functions..." << std::endl;
+
 	if (sampleBases)
 	{
-		std::cout << "proto basis functions are correct" << std::endl;
+		std::cout << "	Proto basis functions are correct" << std::endl;
 	}
 	else
 	{
-		std::cout << "proto basis functions are incorrect" << std::endl;
+		std::cout << "	Proto basis functions are incorrect" << std::endl;
 	}
 
 	return err2;
@@ -313,6 +312,8 @@ LCError protoTest()
 //Test whether linear precision is satisfied 
 LCError linearPrecisionTestCubic()
 {
+	std::cout << "\nTesting linear precision for cubic splines... " << std::endl;
+
 	int nParams = 3;
 	LCError err;
 	LCRealFunction* paramShape = new LCRealFunction(nParams, true);
@@ -335,8 +336,6 @@ LCError linearPrecisionTestCubic()
 			refined++;
 		}
 	}
-
-	grid.log();
 
 	std::vector<Eigen::VectorXi> sampleCombinations;
 	int nSamples = 10;
@@ -381,6 +380,8 @@ LCError linearPrecisionTestCubic()
 
 LCError linearPrecisionTestLinear()
 {
+	std::cout << "\nTesting linear precision for linear splines... " << std::endl;
+
 	int nParams = 1;
 	LCError err;
 	LCRealFunction* paramShape = new LCRealFunction(nParams, true);
@@ -404,8 +405,6 @@ LCError linearPrecisionTestLinear()
 			refined++;
 		}
 	}
-
-	grid.log();
 
 	std::vector<Eigen::VectorXi> sampleCombinations;
 	int nSamples = 10;
@@ -435,6 +434,7 @@ LCError linearPrecisionTestLinear()
 			linearPrecision = false;
 		}
 	}
+
 	if (linearPrecision)
 	{
 		std::cout << "linear precison was verified " << std::endl;
@@ -452,12 +452,13 @@ int main(int argc, char* argv[])
 {
 
 	protoTest();//Test whether parametric shapes can be read and written as proto messages
-	std::vector<double> thresholds = { 0.1 };
-	std::vector<int> maxDepths = { 3 };
-	std::vector<int> bootstraps = { 2 };
-	std::vector<int> errorSamples = { 0 };
 
-	for (int i = 0; i < 1; i++)
+	//Run the interpolation on a variety of parameters. See LCAdaptiveSamplingParams.h
+	std::vector<double> thresholds = { 0.1, 0.5 };
+	std::vector<int> maxDepths = { 3, 3 };
+	std::vector<int> bootstraps = { 2, 1 };
+	std::vector<int> errorSamples = { 0, 0 };
+	for (int i = 0; i < 2; i++)
 	{
 		double threshold = thresholds[i];
 		int maxDepth = maxDepths[i];
@@ -466,16 +467,17 @@ int main(int argc, char* argv[])
 		bool optimalDirection = true;
 
 		LCAdaptiveSamplingParams params(maxDepth, threshold, bootstrap, errorSample);
-		std::cout << "\nthreshold " << threshold << "\nmax depth " << maxDepth 
-				  << "\nbootstrap " << bootstrap << "\nerror samples " << errorSample 
-				  << "\noptimal direction " << optimalDirection << std::endl;
+		std::cout << "\nRunning LOCOInterpolate with the following parameters. See LCAdaptiveSamplingParams.h for details." << std::endl;
+		std::cout << "\tthreshold " << threshold << "\n\tmax depth " << maxDepth 
+				  << "\n\tbootstrap " << bootstrap << "\n\terror samples " << errorSample 
+				  << "\n\toptimal direction " << optimalDirection << "\n..."<<std::endl;
 
 		std::string name = "cubic" + std::string("_thresh_") + std::to_string(threshold) + std::string("_maxDepth_") + std::to_string(maxDepth) + std::string("_bootstrap_") + std::to_string(bootstrap);
 		testFunctionLinearApproximation(params, LCBasisFunction::LCBasisFunctionType::CUBIC_BSPLINE, name, 100);
 	}
 
-	linearPrecisionTestCubic(); //test whether linear precision is satisfied when using a cubic interpolation
 	linearPrecisionTestLinear();//test whether linear precision is satisfied when using a linear interpolation
+	linearPrecisionTestCubic(); //test whether linear precision is satisfied when using a cubic interpolation
 
 	system("pause");
 }

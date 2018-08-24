@@ -143,7 +143,6 @@ LCError testBugSumToOne(LCAdaptiveSamplingParams *params, LCBasisFunction::LCBas
 			LCRealFunctionValue* testInfo = dynamic_cast<LCRealFunctionValue*>(info);
 			double temp = testInfo->val;
 			int val = (int)10 * testInfo->val;
-			std::cout << val << " is the value at " << pos[0] << " " << pos[1] << std::endl;
 		}
 	}
 	return LCError();
@@ -156,7 +155,8 @@ int main(int argc, char* argv[])
 	int bootstrap = 2;
 	LCAdaptiveSamplingParams *params = new LCAdaptiveSamplingParams(maxTreeDepth, threshold, bootstrap, 0, LCAdaptiveSamplingParams::LCSplitPolicy::ERROR_BASED, LCAdaptiveSamplingParams::LCErrorMetric::CENTER_BASED);
 	LCBasisFunction::LCBasisFunctionType basisType = LCBasisFunction::LCBasisFunctionType::CUBIC_BSPLINE;
-	
+	std::cout << "running LOCOInterpolate with the following parameters. See LCAdaptiveSamplingParams.h for details." << std::endl;
+	params->log();
 	//selectiveRefinement(params, basisType);
 	testBugSumToOne(params, basisType);
 }

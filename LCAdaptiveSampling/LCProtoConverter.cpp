@@ -17,8 +17,6 @@ LCError PrecomputedParametricShapeConverter::outputToProto(std::string filename,
 	proto::PrecomputedParametricShape  shapeProto;
 	size_t lastindex = filename.find_last_of(".");
 	std::string filepath = filename.substr(0, lastindex);
-	std::cout << "the filepath is " << filepath << std::endl;
-	std::cout << "the filename is " << filename << std::endl;
 
 	LCErrorReturn(convertToProto(shape, filepath, &shapeProto));
 	LCErrorReturn(saveToFile(shapeProto, filename.c_str(), useAscii));
@@ -86,20 +84,7 @@ LCError convertShapeInfoToProto(LCFunctionValue * shapeInfo, std::string filepat
 		result->set_allocated_functionshapeinfo(protoShapeInfo);
 		return LCError();
 	}
-	/* removed by czw 7-11-2018
-	OCTetCADShapeInfo* tetShapeInfo = dynamic_cast<OCTetCADShapeInfo*>(shapeInfo);
-	if (tetShapeInfo != nullptr)
-	{
-		proto::TetMesh* protoTetMesh = new proto::TetMesh();
-		std::stringstream filename;
-		filename << filepath << "_mesh" << *meshCounter << ".proto";
-		*meshCounter = *meshCounter + 1; 
-		protoTetMesh->set_filename(filename.str());
-		LCErrorReturn(OCTetCADShapeInfoConverter::outputToProto(filename.str(), tetShapeInfo));
-		result->set_allocated_tetmesh(protoTetMesh);
-		return LCError();
-	}
-	*/
+
 	return LCError("undefined type of shape info");
 }
 
@@ -288,23 +273,6 @@ LCError convertShapeInfoToCpp(const proto::ShapeInfo &shapeInfo, LCFunctionValue
 		*result = new LCRealFunctionValue(shapeInfo.functionshapeinfo().val());
 		return LCError();
 	}
-	/*removed by czw 7-11-2018
-	if (shapeInfo.has_tetmesh())
-	{
-		if (shapeInfo.tetmesh().has_filename())
-		{
-			OCTetCADShapeInfo* tetShapeInfo = new OCTetCADShapeInfo(shapeInfo.tetmesh().filename());
-			*result = tetShapeInfo;
-		}
-		else
-		{
-			OCTetCADShapeInfo* tetShapeInfo = new OCTetCADShapeInfo();
-			LCErrorReturn(convertTetMeshToCpp(shapeInfo.tetmesh(), tetShapeInfo));
-			*result = tetShapeInfo;
-		}
-		return LCError();
-	}
-	*/
 	return LCError("type fo shape info not recognized");
 }
 
