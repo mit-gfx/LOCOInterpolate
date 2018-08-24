@@ -1,21 +1,22 @@
 # LOCOInterpolate
-Algorithm for **LO**cal **CO**ntinuous Interpolation[^fn]
+Algorithm for **LO**cal **CO**ntinuous Interpolation developed by Schulz et al 2017.
+Please reference this [this paper](https://homes.cs.washington.edu/~adriana/instantCAD/index.html) for description of the method.
 
 
 # Setup
 Clone repository:
 ```
-git clone git@github.com:czwmit/schulzInterpolate.git
+git clone https://github.com/mit-gfx/LOCOInterpolate
 ```
 
 Download Eigen v3.3.5 from http://eigen.tuxfamily.org/ and place all Eigen files in this location:
 ```
-schulzInterpolate/libs/eigen/
+LOCOInterpolate/libs/eigen/
 ```
 
 Download CMake from https://cmake.org/
 
-# Build on Unix/OSX
+## Build on Unix/OSX
 
 Download Google protobuf v3.1.0: https://github.com/google/protobuf/blob/master/src/README.md
 
@@ -27,10 +28,10 @@ Build protobuf following the instructions here: https://github.com/google/protob
 
 Place the libprotobuf.a file in 
 ```
-schulzInterpolate/libs/protobuf/lib
+LOCOInterpolate/libs/protobuf/lib
 ```
 
-To build InstantCAD, execute the following in the schulzInterpolate directory:
+To build LOCOInterpolate, execute the following in the LOCOInterpolate directory:
 ```
 $ mkdir build && cd build
 $ cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release ..
@@ -39,7 +40,7 @@ $ cd ../../bin
 & ./Test #To verify that the code works.
 ```
 
-# Build on Windows using VisualStudio
+## Build on Windows using VisualStudio
 
 Download and install Google protobuf v3.1.0 according to these directions https://github.com/google/protobuf/blob/master/cmake/README.md
 
@@ -49,19 +50,21 @@ Download and install Google protobuf v3.1.0 according to these directions https:
 
 Place the libprotobuf.lib file in 
 ```
-schulzInterpolate/libs/protobuf/lib
+LOCOInterpolate/libs/protobuf/lib
 ```
 
-To build InstantCAD, execute the following in the schulzInterpolate directory:
+To build LOCOInterpolate, execute the following in the LOCOInterpolate directory:
 ```
 C:\> mkdir build
 C:\> cd build
 C:\> cmake -G "Visual Studio [VERSION] Win64" -DCMAKE_BUILD_TYPE=Release ..
 ```
 
-Open InstantCAD.sln and build the solution in x64 Release mode. Run Test.
+Open LOCOInterpolate.sln and build the solution in x64 Release mode. Run Test.
 
-# LCAdaptiveSampling
+# Code Description
+
+## LCAdaptiveSampling Library
 
 1. *OCAdaptiveGrid* represents the k-d tree in the parameter space. The tree stores samples, which are the result of evaluating various points in the parameter space. These samples are used to interpolate and approximate any given point in the space. Our algorithm adaptively refines this tree until the interpolation approximates the evaluation function to a desired degree of accuracy.
 2. *OCAdaptiveGridCell* represents an element of the k-d tree
@@ -70,7 +73,7 @@ Open InstantCAD.sln and build the solution in x64 Release mode. Run Test.
 5. *OCSample* represents the result of evaluating a particular coordinate in the parameter space.
 6. *OCProtoConverter* handles storage of samples and functions via Google's protobuf 
 
-# LCFunction
+## LCFunction Library
 
 This library contains the abstract class that defines a a function _f_: _X_-> _Y_, where:
 
