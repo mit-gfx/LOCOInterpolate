@@ -1,5 +1,5 @@
 # LOCOInterpolate
-Algorithm for **LO**cal **CO**ntinuous Interpolation[^fn]
+Algorithm for **LO**cal **CO**ntinuous Interpolation developed by Schulz et al 2017. 
 
 
 # Setup
@@ -10,7 +10,7 @@ git clone git@github.com:czwmit/schulzInterpolate.git
 
 Download Eigen v3.3.5 from http://eigen.tuxfamily.org/ and place all Eigen files in this location:
 ```
-schulzInterpolate/libs/eigen/
+LOCOInterpolate/libs/eigen/
 ```
 
 Download CMake from https://cmake.org/
