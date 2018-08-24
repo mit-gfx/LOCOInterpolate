@@ -16,7 +16,7 @@ LOCOInterpolate/libs/eigen/
 
 Download CMake from https://cmake.org/
 
-# Build on Unix/OSX
+## Build on Unix/OSX
 
 Download Google protobuf v3.1.0: https://github.com/google/protobuf/blob/master/src/README.md
 
@@ -40,7 +40,7 @@ $ cd ../../bin
 & ./Test #To verify that the code works.
 ```
 
-# Build on Windows using VisualStudio
+## Build on Windows using VisualStudio
 
 Download and install Google protobuf v3.1.0 according to these directions https://github.com/google/protobuf/blob/master/cmake/README.md
 
@@ -62,7 +62,9 @@ C:\> cmake -G "Visual Studio [VERSION] Win64" -DCMAKE_BUILD_TYPE=Release ..
 
 Open InstantCAD.sln and build the solution in x64 Release mode. Run Test.
 
-# LCAdaptiveSampling
+# Code Description
+
+## LCAdaptiveSampling Library
 
 1. *OCAdaptiveGrid* represents the k-d tree in the parameter space. The tree stores samples, which are the result of evaluating various points in the parameter space. These samples are used to interpolate and approximate any given point in the space. Our algorithm adaptively refines this tree until the interpolation approximates the evaluation function to a desired degree of accuracy.
 2. *OCAdaptiveGridCell* represents an element of the k-d tree
@@ -71,7 +73,7 @@ Open InstantCAD.sln and build the solution in x64 Release mode. Run Test.
 5. *OCSample* represents the result of evaluating a particular coordinate in the parameter space.
 6. *OCProtoConverter* handles storage of samples and functions via Google's protobuf 
 
-# LCFunction
+## LCFunction Library
 
 This library contains the abstract class that defines a a function _f_: _X_-> _Y_, where:
 
