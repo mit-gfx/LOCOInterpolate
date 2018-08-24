@@ -27,7 +27,7 @@ Build protobuf following the instructions here: https://github.com/google/protob
 
 Place the libprotobuf.a file in 
 ```
-schulzInterpolate/libs/protobuf/lib
+LOCOInterpolate/libs/protobuf/lib
 ```
 
 To build InstantCAD, execute the following in the schulzInterpolate directory:
@@ -49,7 +49,7 @@ Download and install Google protobuf v3.1.0 according to these directions https:
 
 Place the libprotobuf.lib file in 
 ```
-schulzInterpolate/libs/protobuf/lib
+LOCOInterpolate/libs/protobuf/lib
 ```
 
 To build InstantCAD, execute the following in the schulzInterpolate directory:
