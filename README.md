@@ -31,7 +31,7 @@ Place the libprotobuf.a file in
 LOCOInterpolate/libs/protobuf/lib
 ```
 
-To build InstantCAD, execute the following in the LOCOInterpolate directory:
+To build LOCOInterpolate, execute the following in the LOCOInterpolate directory:
 ```
 $ mkdir build && cd build
 $ cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release ..
@@ -53,14 +53,14 @@ Place the libprotobuf.lib file in
 LOCOInterpolate/libs/protobuf/lib
 ```
 
-To build InstantCAD, execute the following in the LOCOInterpolate directory:
+To build LOCOInterpolate, execute the following in the LOCOInterpolate directory:
 ```
 C:\> mkdir build
 C:\> cd build
 C:\> cmake -G "Visual Studio [VERSION] Win64" -DCMAKE_BUILD_TYPE=Release ..
 ```
 
-Open InstantCAD.sln and build the solution in x64 Release mode. Run Test.
+Open LOCOInterpolate.sln and build the solution in x64 Release mode. Run Test.
 
 # Code Description
 
